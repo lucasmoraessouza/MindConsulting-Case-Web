@@ -2,7 +2,7 @@
 
 Sistema de web de controle de usuários, utilizando ReactJS. Feito para cadastrar e gerenciar usuários por nivel de acesso, utilizando autenticação e conexão com a base de dados MySQL.
 
-- Nivel de acesso administrativo (999) - Tem acesso a listagem, desativação e alteraração dos usuarios cadastrados.
+- Nivel de acesso administrativo (999) - Tem acesso a listagem, desativação e alteração dos usuarios cadastrados.
 - Nivel de acesso Comum (1) - Tem acesso somente a seu perfil, podendo modifica-lo.
 - Nivel de acesso desabilitado (0) - Não tem acesso a plataforma.
 
