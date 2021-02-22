@@ -1,15 +1,39 @@
-import Login from "./views/pages/Login";
-import Register from "./views/pages/Register";
-import Dashboard from "./components/Dashboard";
-import FormAdmin from "./views/pages/FormAdmin";
-import FormUser from "./views/pages/FormUser";
+// import { routes, PrivateRoute } from './routes'
+import { routes, PrivateRoute } from './routes'
+import Dashboard from './components/Dashboard'
+import { isAuthenticated } from './services/auth'
+
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom'
 
 function App() {
   return (
-    <div className="App">
-      <FormUser />
-    </div>
-  );
+    <Router>
+      <Switch>
+        <Route exact path="/admin">
+          {isAuthenticated() ? (
+            <Redirect to="/dashboard" />
+          ) : (
+            <Redirect to="/login" />
+          )}
+        </Route>
+        {routes.public.map((route, index) => (
+          <Route
+            key={index}
+            path={route.path}
+            exact
+            component={route.component}
+          />
+        ))}
+
+        <PrivateRoute path="/dashboard" component={Dashboard} />
+      </Switch>
+    </Router>
+  )
 }
 
-export default App;
+export default App

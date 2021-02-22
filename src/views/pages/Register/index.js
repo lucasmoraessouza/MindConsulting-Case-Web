@@ -1,17 +1,45 @@
-import React from "react";
-import Button from "@material-ui/core/Button";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
-import Box from "@material-ui/core/Box";
-import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
+import React, { useState } from 'react'
+import Button from '@material-ui/core/Button'
+import CssBaseline from '@material-ui/core/CssBaseline'
+import TextField from '@material-ui/core/TextField'
+import Paper from '@material-ui/core/Paper'
+import Box from '@material-ui/core/Box'
+import Grid from '@material-ui/core/Grid'
+import Typography from '@material-ui/core/Typography'
 
-import Copyright from "../../../components/Copyright";
-import useStyles from "../../assets/styles/auth";
+import api from '../../../services/api'
+import Copyright from '../../../components/Copyright'
+import useStyles from '../../assets/styles/auth'
+import { saveToken, localUser } from '../../../services/auth'
+import { useHistory } from 'react-router-dom'
 
 export default function Register() {
-  const classes = useStyles();
+  const classes = useStyles()
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [cpf, setCpf] = useState('')
+  const [password, setPassword] = useState('')
+  const history = useHistory()
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      const response = await api.post('/register', {
+        name,
+        cpf,
+        email,
+        password,
+      })
+      saveToken(response.data.token)
+      localUser(response.data.user)
+
+      if (response.data.user) history.push('/dashboard/home')
+
+      if (response.data.error) console.log(response.data.error)
+    } catch (err) {
+      console.log(err)
+    }
+  }
 
   return (
     <Grid container component="main" className={classes.root}>
@@ -35,6 +63,8 @@ export default function Register() {
               name="name"
               autoComplete="name"
               autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
             />
             <TextField
               variant="standard"
@@ -46,6 +76,8 @@ export default function Register() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
             <TextField
               variant="standard"
@@ -57,6 +89,8 @@ export default function Register() {
               name="cpf"
               autoComplete="cpf"
               autoFocus
+              value={cpf}
+              onChange={(e) => setCpf(e.target.value)}
             />
             <TextField
               variant="standard"
@@ -68,6 +102,8 @@ export default function Register() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
             <Button
               type="submit"
@@ -75,6 +111,7 @@ export default function Register() {
               variant="contained"
               color="primary"
               className={classes.submit}
+              onClick={handleSubmit}
             >
               Cadastrar
             </Button>
@@ -85,5 +122,5 @@ export default function Register() {
         </div>
       </Grid>
     </Grid>
-  );
+  )
 }
