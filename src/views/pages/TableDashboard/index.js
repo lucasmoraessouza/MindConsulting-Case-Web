@@ -189,7 +189,7 @@ export default function TableDashboard() {
           { title: 'Nível', field: 'level', type: 'numeric' },
         ]}
         data={infoUser}
-        title="Demo Title"
+        title="Lista de Usuários"
       />
     </div>
   )

@@ -7,6 +7,7 @@ import Box from '@material-ui/core/Box'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
 
+import Swal from 'sweetalert2'
 import api from '../../../services/api'
 import Copyright from '../../../components/Copyright'
 import useStyles from '../../assets/styles/auth'
@@ -36,8 +37,12 @@ export default function Register() {
       if (response.data.user) history.push('/dashboard/home')
 
       if (response.data.error) console.log(response.data.error)
-    } catch (err) {
-      console.log(err)
+    } catch (response) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: response.data.error,
+      })
     }
   }
 
