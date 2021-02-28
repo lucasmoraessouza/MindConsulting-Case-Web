@@ -39,6 +39,25 @@ const useStyles = makeStyles((theme) => ({
     marginLeft: 20,
     color: 'grey',
   },
+  image: {
+    borderRadius: '50%',
+    width: 100,
+    height: 100,
+  },
+  divImage: {
+    margin: 15,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  buttonFile: {
+    display: 'none',
+  },
+  label: {
+    margin: 10,
+    color: 'blue',
+    cursor: 'pointer',
+  },
 }))
 
 export default useStyles

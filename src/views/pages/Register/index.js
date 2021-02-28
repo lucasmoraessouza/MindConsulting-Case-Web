@@ -6,6 +6,7 @@ import Paper from '@material-ui/core/Paper'
 import Box from '@material-ui/core/Box'
 import Grid from '@material-ui/core/Grid'
 import Typography from '@material-ui/core/Typography'
+import MaterialInput from '@material-ui/core/Input'
 
 import Swal from 'sweetalert2'
 import api from '../../../services/api'
@@ -13,6 +14,7 @@ import Copyright from '../../../components/Copyright'
 import useStyles from '../../assets/styles/auth'
 import { saveToken, localUser } from '../../../services/auth'
 import { useHistory } from 'react-router-dom'
+import InputMask from '../../../components/MaskedInput'
 
 export default function Register() {
   const classes = useStyles()
@@ -84,19 +86,19 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+
             <TextField
               variant="standard"
               margin="normal"
               required
               fullWidth
-              id="cpf"
-              label="CPF"
               name="cpf"
-              autoComplete="cpf"
-              autoFocus
+              label="CPF"
+              type="cpf"
+              id="cpf"
               value={cpf}
-              onChange={(e) => setCpf(e.target.value)}
             />
+
             <TextField
               variant="standard"
               margin="normal"

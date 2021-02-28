@@ -246,18 +246,21 @@ export default function Dashboard(props) {
         <Divider />
         <List>
           {level == 1
-            ? routes.user.map((route, index) => (
-                <ListItem
-                  button
-                  key={index}
-                  onClick={() => history.push(route.path)}
-                >
-                  <ListItemIcon>
-                    <DashboardIcon />
-                  </ListItemIcon>
-                  <ListItemText primary={route.title} />
-                </ListItem>
-              ))
+            ? routes.user.map((route, index) => {
+                if (route.title)
+                  return (
+                    <ListItem
+                      button
+                      key={index}
+                      onClick={() => history.push(route.path)}
+                    >
+                      <ListItemIcon>
+                        <DashboardIcon />
+                      </ListItemIcon>
+                      <ListItemText primary={route.title} />
+                    </ListItem>
+                  )
+              })
             : routes.admin.map((route, index) => {
                 if (route.title)
                   return (

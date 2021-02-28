@@ -34,19 +34,32 @@ export default function Checkout() {
   const [name, setName] = useState('')
   const [cpf, setCpf] = useState('')
   const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [file, setFile] = useState({})
+  const [preview, setPreview] = useState('')
+  const [image, setImage] = useState('')
 
   useEffect(() => {
     handleChange()
   }, [])
 
+  const handleUpload = async (file) => {
+    setFile(file[0])
+    setDisable(false)
+    setPreview(URL.createObjectURL(file[0]))
+    console.log(preview)
+  }
+
   const handleChange = async () => {
     try {
       const user = await getUser()
       const response = await api.get(`/user/${user.id}`)
-      console.log(response)
       setName(response.data.user.name)
       setCpf(response.data.user.cpf)
       setEmail(response.data.user.email)
+      setPassword(response.data.user.password)
+      setImage(response.data.user.image)
+      console.log(response.data.user.password)
     } catch (err) {}
   }
 
@@ -56,12 +69,35 @@ export default function Checkout() {
 
   const handleRefresh = async () => {
     setDisable(true)
+    const data = new FormData()
+    console.log(file)
+
     const user = await getUser()
-    const response = await api.put(`/user/${user.id}`, {
-      name,
-      cpf,
-      email,
-    })
+
+    if (file.name) {
+      data.append('file', file, file.name)
+      data.append('name', name)
+      data.append('cpf', cpf)
+      data.append('email', email)
+      if (password !== undefined) data.append('password', password)
+      const response = await api.put(`/user/${user.id}`, data)
+    } else {
+      if (password !== undefined) {
+        const response = await api.put(`/user/${user.id}`, {
+          name,
+          cpf,
+          email,
+          password,
+        })
+      } else {
+        const response = await api.put(`/user/${user.id}`, {
+          name,
+          cpf,
+          email,
+          password,
+        })
+      }
+    }
     Swal.fire('Atualizado com sucesso.')
     const newUser = { ...user, name: name, cpf: cpf, email: email }
     localUser(newUser)
@@ -70,11 +106,6 @@ export default function Checkout() {
   return (
     <React.Fragment>
       <CssBaseline />
-      <AppBar
-        position="absolute"
-        color="default"
-        className={classes.appBar}
-      ></AppBar>
       <main className={classes.layout}>
         <Paper className={classes.paper}>
           <Typography component="h1" variant="h4" align="center">
@@ -83,9 +114,27 @@ export default function Checkout() {
           </Typography>
           <React.Fragment>
             <React.Fragment>
-              <Typography variant="h6" gutterBottom>
-                Dados
-              </Typography>
+              <div className={classes.divImage}>
+                {preview !== '' ? (
+                  <img className={classes.image} src={preview} />
+                ) : image !== 'null' ? (
+                  <img
+                    className={classes.image}
+                    src={`http://192.168.0.13:4000/upload/${image}`}
+                  />
+                ) : (
+                  <img className={classes.image} src="../image/anonimo.jpg" />
+                )}
+                <label for="selecao-arquivo" className={classes.label}>
+                  Alterar imagem
+                </label>
+                <input
+                  id="selecao-arquivo"
+                  type="file"
+                  className={classes.buttonFile}
+                  onChange={(e) => handleUpload(e.target.files)}
+                />
+              </div>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={12}>
                   <TextField
@@ -123,6 +172,20 @@ export default function Checkout() {
                     disabled={disable}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                  />
+                  <TextField
+                    variant="standard"
+                    margin="normal"
+                    required
+                    fullWidth
+                    name="password"
+                    label="Senha"
+                    type="password"
+                    id="password"
+                    disabled={disable}
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                   />
                 </Grid>
               </Grid>

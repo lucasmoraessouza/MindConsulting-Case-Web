@@ -2,6 +2,7 @@
 import { routes, PrivateRoute } from './routes'
 import Dashboard from './components/Dashboard'
 import { isAuthenticated } from './services/auth'
+import NotFound from './components/NotFound'
 
 import {
   BrowserRouter as Router,
@@ -29,8 +30,8 @@ function App() {
             component={route.component}
           />
         ))}
-
         <PrivateRoute path="/dashboard" component={Dashboard} />
+        <Route component={NotFound} />
       </Switch>
     </Router>
   )
