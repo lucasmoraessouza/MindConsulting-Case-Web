@@ -27,19 +27,7 @@ import { Switch, withRouter, Route, useHistory } from 'react-router-dom'
 import { routes } from '../../routes'
 import { logout, getUser } from '../../services/auth'
 import api from '../../services/api'
-
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {'Copyright © '}
-      <Link color="" href="https://material-ui.com/">
-        Mind Consulting
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  )
-}
+import Copyright from '../Copyright'
 
 const drawerWidth = 240
 
@@ -136,6 +124,12 @@ const useStyles = makeStyles((theme) => ({
   user: {
     fontSize: 12,
   },
+  userImage: {
+    borderRadius: '50%',
+    width: 45,
+    height: 45,
+    marginRight: 5,
+  },
 }))
 
 export default function Dashboard(props) {
@@ -219,6 +213,14 @@ export default function Dashboard(props) {
           >
             {title}
           </Typography>
+          {user.image === 'null' ? (
+            <img className={classes.userImage} src="../image/anonimo.jpg" />
+          ) : (
+            <img
+              className={classes.userImage}
+              src={`http://192.168.0.13:4000/upload/${user.image}`}
+            />
+          )}
           <Typography
             component="h1"
             variant="h6"

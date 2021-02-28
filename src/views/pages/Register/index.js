@@ -27,9 +27,29 @@ export default function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
+      if (name === '' || cpf === '' || email === '' || password === '') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Campo vazio',
+        })
+        return
+      }
+
+      if (email.indexOf('@') == -1 || email.indexOf('.') == -1) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Por favor, informe um E-MAIL válido!',
+        })
+        return
+      }
+
+      const newCpf = cpf.replace(/[^0-9s]/g, '')
+      console.log(newCpf)
       const response = await api.post('/register', {
         name,
-        cpf,
+        cpf: newCpf,
         email,
         password,
       })
@@ -46,6 +66,14 @@ export default function Register() {
         text: response.data.error,
       })
     }
+  }
+  const cpfMask = (value) => {
+    return value
+      .replace(/\D/g, '') // substitui qualquer caracter que nao seja numero por nada
+      .replace(/(\d{3})(\d)/, '$1.$2') // captura 2 grupos de numero o primeiro de 3 e o segundo de 1, apos capturar o primeiro grupo ele adiciona um ponto antes do segundo grupo de numero
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1') // captura 2 numeros seguidos de um traço e não deixa ser digitado mais nada
   }
 
   return (
@@ -97,6 +125,7 @@ export default function Register() {
               type="cpf"
               id="cpf"
               value={cpf}
+              onChange={(e) => setCpf(cpfMask(e.target.value))}
             />
 
             <TextField

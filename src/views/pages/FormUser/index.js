@@ -59,7 +59,6 @@ export default function Checkout() {
       setEmail(response.data.user.email)
       setPassword(response.data.user.password)
       setImage(response.data.user.image)
-      console.log(response.data.user.password)
     } catch (err) {}
   }
 
@@ -67,39 +66,64 @@ export default function Checkout() {
     setDisable(false)
   }
 
+  const cpfMask = (value) => {
+    return value
+      .replace(/\D/g, '') // substitui qualquer caracter que nao seja numero por nada
+      .replace(/(\d{3})(\d)/, '$1.$2') // captura 2 grupos de numero o primeiro de 3 e o segundo de 1, apos capturar o primeiro grupo ele adiciona um ponto antes do segundo grupo de numero
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1') // captura 2 numeros seguidos de um traço e não deixa ser digitado mais nada
+  }
+
   const handleRefresh = async () => {
     setDisable(true)
-    const data = new FormData()
-    console.log(file)
 
     const user = await getUser()
+    let imageUser = ''
 
     if (file.name) {
+      const data = new FormData()
       data.append('file', file, file.name)
-      data.append('name', name)
-      data.append('cpf', cpf)
-      data.append('email', email)
-      if (password !== undefined) data.append('password', password)
-      const response = await api.put(`/user/${user.id}`, data)
+      const response = await api.put(`/image/${user.id}`, data)
+      imageUser = response.data.image
+    }
+
+    const newCpf = cpf.replace(/[^0-9s]/g, '')
+    console.log(newCpf)
+
+    if (password !== undefined) {
+      await api.put(`/user/${user.id}`, {
+        name,
+        cpf: newCpf,
+        email,
+        password,
+      })
     } else {
-      if (password !== undefined) {
-        const response = await api.put(`/user/${user.id}`, {
-          name,
-          cpf,
-          email,
-          password,
-        })
-      } else {
-        const response = await api.put(`/user/${user.id}`, {
-          name,
-          cpf,
-          email,
-          password,
-        })
+      await api.put(`/user/${user.id}`, {
+        name,
+        cpf: newCpf,
+        email,
+      })
+    }
+
+    Swal.fire('Atualizado com sucesso.')
+    let newUser
+    if (imageUser !== '') {
+      newUser = {
+        ...user,
+        name: name,
+        cpf: cpf,
+        email: email,
+        image: imageUser,
+      }
+    } else {
+      newUser = {
+        ...user,
+        name: name,
+        cpf: cpf,
+        email: email,
       }
     }
-    Swal.fire('Atualizado com sucesso.')
-    const newUser = { ...user, name: name, cpf: cpf, email: email }
     localUser(newUser)
   }
 
@@ -158,8 +182,8 @@ export default function Checkout() {
                     fullWidth
                     autoComplete="id"
                     disabled={disable}
-                    value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
+                    value={cpfMask(cpf)}
+                    onChange={(e) => setCpf(cpfMask(e.target.value))}
                   />
                 </Grid>
                 <Grid item xs={12}>

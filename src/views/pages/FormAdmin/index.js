@@ -33,19 +33,44 @@ export default function Checkout() {
   const [email, setEmail] = useState('')
   const [cpf, setCpf] = useState('')
   const [level, setLevel] = useState('')
+  const [preview, setPreview] = useState('')
+  const [image, setImage] = useState('')
+  const [file, setFile] = useState({})
 
   useEffect(() => {
     handleChange()
   }, [])
 
+  const handleUpload = async (file) => {
+    setFile(file[0])
+    setPreview(URL.createObjectURL(file[0]))
+    console.log(preview)
+  }
+
+  const cpfMask = (value) => {
+    return value
+      .replace(/\D/g, '') // substitui qualquer caracter que nao seja numero por nada
+      .replace(/(\d{3})(\d)/, '$1.$2') // captura 2 grupos de numero o primeiro de 3 e o segundo de 1, apos capturar o primeiro grupo ele adiciona um ponto antes do segundo grupo de numero
+      .replace(/(\d{3})(\d)/, '$1.$2')
+      .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+      .replace(/(-\d{2})\d+?$/, '$1') // captura 2 numeros seguidos de um traço e não deixa ser digitado mais nada
+  }
+
   const handleUpdate = async () => {
+    const newCpf = cpf.replace(/[^0-9s]/g, '')
     const id = getId()
     const response = await api.put(`/user/${id}`, {
       name,
-      cpf,
+      cpf: newCpf,
       email,
       level,
     })
+
+    if (file.name) {
+      const data = new FormData()
+      data.append('file', file, file.name)
+      const response = await api.put(`/image/${id}`, data)
+    }
     Swal.fire('Atualizado com sucesso.')
   }
 
@@ -57,6 +82,7 @@ export default function Checkout() {
       setEmail(response.data.user.email)
       setCpf(response.data.user.cpf)
       setLevel(response.data.user.level)
+      setImage(response.data.user.image)
     } catch (err) {}
   }
 
@@ -75,6 +101,27 @@ export default function Checkout() {
           </Typography>
           <React.Fragment>
             <React.Fragment>
+              <div className={classes.divImage}>
+                {preview !== '' ? (
+                  <img className={classes.image} src={preview} />
+                ) : image !== 'null' ? (
+                  <img
+                    className={classes.image}
+                    src={`http://192.168.0.13:4000/upload/${image}`}
+                  />
+                ) : (
+                  <img className={classes.image} src="../image/anonimo.jpg" />
+                )}
+                <label for="selecao-arquivo" className={classes.label}>
+                  Alterar imagem
+                </label>
+                <input
+                  id="selecao-arquivo"
+                  type="file"
+                  className={classes.buttonFile}
+                  onChange={(e) => handleUpload(e.target.files)}
+                />
+              </div>
               <Typography variant="h6" gutterBottom>
                 Dados
               </Typography>
@@ -99,8 +146,8 @@ export default function Checkout() {
                     label="CPF"
                     fullWidth
                     autoComplete="id"
-                    value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
+                    value={cpfMask(cpf)}
+                    onChange={(e) => setCpf(cpfMask(e.target.value))}
                   />
                 </Grid>
                 <Grid item xs={12}>
